@@ -11,7 +11,7 @@ class SQLBuilder(object):
             try:
                 str_tuple = (str, unicode)
             except:
-                str_tuple = (str)
+                str_tuple = (str,)
             if isinstance(v, str_tuple):
                 new_v = escape_string(v.replace('%', '%%').replace(':', '\\:'))
                 output[k] = "'{new_v}'".format(new_v=new_v)
