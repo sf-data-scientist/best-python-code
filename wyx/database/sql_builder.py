@@ -8,7 +8,11 @@ class SQLBuilder(object):
     def translate_value(cls, input):
         output = copy.deepcopy(input)
         for k, v in output.items():
-            if isinstance(v, str):
+            try:
+                str_tuple = (str, unicode)
+            except:
+                str_tuple = (str)
+            if isinstance(v, str_tuple):
                 new_v = escape_string(v.replace('%', '%%').replace(':', '\\:'))
                 output[k] = "'{new_v}'".format(new_v=new_v)
             elif v is None:
