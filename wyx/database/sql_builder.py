@@ -47,3 +47,27 @@ class SQLBuilder(object):
         ON DUPLICATE KEY UPDATE {assignment_list};""".format(table=table, columns=columns_s, values=values_s,
                                                              assignment_list=assignment_list_s)
         return sql
+
+    @classmethod
+    def insert_ignore_into_on_duplicate_update_id(cls, table, insert_columns, values):
+        # 1. check
+        if isinstance(insert_columns, (list, tuple)):
+            insert_columns = tuple(insert_columns)
+        else:
+            raise Exception('insert_columns only support list or tuple')
+
+        # 2. build columns & assignment_list
+        columns_s = str(insert_columns).replace('\'', '').replace("\"", "")
+
+        # 3. build values
+        values = copy.deepcopy(values)
+        value_template = '(' + ','.join(['{' + i + '}' for i in insert_columns]) + ')'
+        values = [cls.translate_value(i) for i in values]
+        values = [value_template.format(**i) for i in values]
+        values_s = ','.join(values)
+
+        sql = """
+        INSERT IGNORE INTO {table} {columns}
+        VALUES {values}
+        ON DUPLICATE KEY UPDATE id=id;""".format(table=table, columns=columns_s, values=values_s)
+        return sql
